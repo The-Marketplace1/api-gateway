@@ -1,0 +1,14 @@
+process.env["PORT"] = "0";
+process.env["NODE_ENV"] = "test";
+process.env["JWT_SECRET"] = "test-secret-for-testing-only-must-be-32chars!!";
+process.env["REDIS_URL"] = "redis://localhost:6379";
+process.env["AUTH_SERVICE_URL"] = "http://localhost:3001";
+process.env["BACKEND_API_URL"] = "http://localhost:3002";
+process.env["PAYMENT_SERVICE_URL"] = "http://localhost:3003";
+process.env["REALTIME_SERVICE_URL"] = "http://localhost:3004";
+process.env["NOTIFICATION_SERVICE_URL"] = "http://localhost:3005";
+process.env["ALLOWED_ORIGINS"] = "http://localhost:3000";
+process.env["PLATFORM_NAME"] = "Marketplace";
+process.env["PLATFORM_VERSION"] = "v1";
+process.env["SERVICE_NAME"] = "api-gateway";
+process.env["LOG_LEVEL"] = "silent";

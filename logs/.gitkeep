@@ -1,0 +1,2 @@
+# This file keeps the logs/ directory in version control.
+# access.log and error.log are written at runtime and are gitignored.

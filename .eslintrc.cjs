@@ -1,0 +1,33 @@
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+  root: true,
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    ecmaVersion: 2022,
+    sourceType: "module",
+    project: ["./tsconfig.base.json", "./artifacts/*/tsconfig.json"],
+  },
+  plugins: ["@typescript-eslint"],
+  extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+  ],
+  rules: {
+    "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/await-thenable": "error",
+    "no-console": ["error", { allow: ["warn", "error"] }],
+    "@typescript-eslint/return-await": ["error", "in-try-catch"],
+  },
+  ignorePatterns: [
+    "node_modules/",
+    "dist/",
+    "*.mjs",
+    "*.cjs",
+    "build.mjs",
+    "vitest.config.ts",
+  ],
+};

@@ -1,0 +1,82 @@
+version: "3.9"
+
+services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+      JWT_SECRET: ${JWT_SECRET}
+      REDIS_URL: redis://redis:6379
+      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL:-http://auth-service:3001}
+      BACKEND_API_URL: ${BACKEND_API_URL:-http://backend-api:3002}
+      PAYMENT_SERVICE_URL: ${PAYMENT_SERVICE_URL:-http://payment-service:3003}
+      REALTIME_SERVICE_URL: ${REALTIME_SERVICE_URL:-http://realtime-service:3004}
+      NOTIFICATION_SERVICE_URL: ${NOTIFICATION_SERVICE_URL:-http://notification-service:3005}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000}
+      PLATFORM_NAME: Marketplace
+      PLATFORM_VERSION: v1
+      SERVICE_NAME: api-gateway
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+
+    depends_on:
+      redis:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+    networks:
+      - marketplace
+
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/api/healthz"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+    volumes:
+      - gateway-logs:/app/logs
+
+
+  redis:
+    image: redis:7-alpine
+
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+
+    ports:
+      - "6379:6379"
+
+    volumes:
+      - redis-data:/data
+
+    restart: unless-stopped
+
+    networks:
+      - marketplace
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+
+networks:
+  marketplace:
+    driver: bridge
+
+
+volumes:
+  redis-data:
+  gateway-logs:

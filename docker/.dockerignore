@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.git/
+.github/
+.env
+logs/access.log
+logs/error.log
+*.tsbuildinfo
+.tsbuildinfo
+docs/
+*.md
+docker-compose.yml
+.npmrc
+.editorconfig
+.prettierrc
+.eslintrc.cjs
