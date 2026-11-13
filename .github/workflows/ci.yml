@@ -54,6 +54,8 @@ jobs:
       NODE_ENV: test
       PORT: "8080"
       JWT_SECRET: "ci-test-secret-for-github-actions-only-32chars"
+      INTERNAL_SERVICE_TOKEN: "ci-internal-service-token-at-least-32chars!"
+      METRICS_TOKEN: "ci-metrics-token-at-least-32chars-long!"
       REDIS_URL: redis://localhost:6379
       AUTH_SERVICE_URL: http://localhost:3001
       BACKEND_API_URL: http://localhost:3002
@@ -76,7 +78,7 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - run: pnpm --filter ./artifacts/api-server run test
+      - run: pnpm run test
 
   build-docker:
     name: Build Docker Image
