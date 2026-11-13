@@ -11,4 +11,6 @@ process.env["ALLOWED_ORIGINS"] = "http://localhost:3000";
 process.env["PLATFORM_NAME"] = "Marketplace";
 process.env["PLATFORM_VERSION"] = "v1";
 process.env["SERVICE_NAME"] = "api-gateway";
-process.env["LOG_LEVEL"] = "silent";
+process.env["LOG_LEVEL"] = "error";
+process.env["INTERNAL_SERVICE_TOKEN"] = "test-internal-service-token-at-least-32chars!";
+process.env["METRICS_TOKEN"] = "test-metrics-token-at-least-32chars-long!";

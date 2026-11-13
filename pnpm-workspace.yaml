@@ -4,6 +4,8 @@ packages:
   - lib/*
   - services/*
 
+allowBuilds:
+  esbuild: true
 autoInstallPeers: false
 
 # 1. Change "catalog:" to "catalogs:"
@@ -14,8 +16,6 @@ catalogs:
     'tsx': ^4.21.0       # Fixed missing opening quote
     'zod': ^3.25.76      # Fixed missing opening quote
 
-onlyBuiltDependencies:
-  - esbuild
-
 overrides:
   esbuild: 0.27.3
+

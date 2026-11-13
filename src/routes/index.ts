@@ -5,17 +5,16 @@ import apiRoutes from "./api.routes.js";
 import paymentRoutes from "./payment.routes.js";
 import realtimeRoutes from "./realtime.routes.js";
 import notificationRoutes from "./notification.routes.js";
+import { authMiddleware } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
 router.use(healthRouter);
-
 router.use("/auth", authRoutes);
-router.use("/payments", paymentRoutes);
-router.use("/realtime", realtimeRoutes);
-router.use("/notifications", notificationRoutes);
 
-router.use("/", apiRoutes);
+router.use("/payments", authMiddleware, paymentRoutes);
+router.use("/realtime", authMiddleware, realtimeRoutes);
+router.use("/notifications", authMiddleware, notificationRoutes);
+router.use("/", authMiddleware, apiRoutes);
 
 export default router;
-

@@ -1,53 +1,47 @@
 import type { Request, Response, NextFunction } from "express";
-import { PLATFORM, PLATFORM_HEADERS } from "../constants/platform.constants.js";
+import jwt from "jsonwebtoken";
+import { env } from "../config/env.js";
+import { errorResponse } from "../utils/response.js";
 
-export function platformIdentityMiddleware(
-  _req: Request,
-  res: Response,
-  next: NextFunction,
-): void {
-  res.setHeader(PLATFORM_HEADERS.PLATFORM, PLATFORM.NAME);
-  res.setHeader(PLATFORM_HEADERS.PLATFORM_VERSION, PLATFORM.VERSION);
-  res.setHeader(PLATFORM_HEADERS.SERVICE, PLATFORM.SERVICE);
-  next();
+export interface JwtUserPayload {
+  userId: string;
+  role: "customer" | "professional" | "admin";
+  email?: string;
 }
 
-export function requestContextMiddleware(
-  req: Request,
-  _res: Response,
-  next: NextFunction,
-): void {
-  req.headers["x-platform"] = PLATFORM.NAME;
-  req.headers["x-gateway-service"] = PLATFORM.SERVICE;
-  next();
-}
-
-export function sanitizePayloadMiddleware(
+export function authMiddleware(
   req: Request,
   res: Response,
   next: NextFunction,
 ): void {
-  const contentType = req.headers["content-type"] ?? "";
+  const authHeader = req.headers.authorization;
 
-  if (
-    req.method !== "GET" &&
-    req.method !== "DELETE" &&
-    req.method !== "OPTIONS" &&
-    contentType &&
-    !contentType.includes("application/json") &&
-    !contentType.includes("application/x-www-form-urlencoded") &&
-    !contentType.includes("multipart/form-data")
-  ) {
-    res.status(415).json({
-      success: false,
-      error: {
-        code: "UNSUPPORTED_MEDIA_TYPE",
-        message: "Content-Type must be application/json",
-      },
-    });
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    errorResponse(res, 401, "UNAUTHORIZED", "No token provided");
     return;
   }
 
-  next();
-}
+  const token = authHeader.slice(7).trim();
+  if (!token) {
+    errorResponse(res, 401, "UNAUTHORIZED", "No token provided");
+    return;
+  }
 
+  try {
+    const decoded = jwt.verify(token, env.JWT_SECRET) as JwtUserPayload;
+    req.user = decoded;
+    if (decoded.userId) {
+      req.headers["x-user-id"] = decoded.userId;
+    }
+    if (decoded.role) {
+      req.headers["x-user-role"] = decoded.role;
+    }
+    next();
+  } catch (err) {
+    if (err instanceof jwt.TokenExpiredError) {
+      errorResponse(res, 401, "TOKEN_EXPIRED", "Token has expired");
+      return;
+    }
+    errorResponse(res, 401, "UNAUTHORIZED", "Invalid token");
+  }
+}
