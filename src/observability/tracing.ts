@@ -28,9 +28,10 @@ export function tracingMiddleware(req: Request, res: Response, next: NextFunctio
       "service.name": process.env["OTEL_SERVICE_NAME"] ?? "api-gateway",
     },
   });
+
   const spanContext = trace.setSpan(context.active(), span);
   propagation.inject(spanContext, req.headers, {
-    set(carrier, key, value) {
+    set(carrier: Record<string, unknown>, key: string, value: unknown) {
       carrier[key] = value;
     },
   });
@@ -42,4 +43,3 @@ export function tracingMiddleware(req: Request, res: Response, next: NextFunctio
 
   context.with(spanContext, next);
 }
-

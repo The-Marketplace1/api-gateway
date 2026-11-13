@@ -7,7 +7,6 @@ import { buildCorsOptions } from "./config/cors.config.js";
 import { buildPinoHttpOptions } from "./config/logger.config.js";
 import { logger } from "./lib/logger.js";
 import { requestIdMiddleware } from "./middleware/requestId.middleware.js";
-import { authMiddleware } from "./middleware/auth.middleware.js";
 import {
   platformIdentityMiddleware,
   requestContextMiddleware,
@@ -37,7 +36,7 @@ app.use(
     contentSecurityPolicy: true,
     hsts: { maxAge: 31536000, includeSubDomains: true },
     xPoweredBy: false,
-  }),
+  })
 );
 
 app.use(cors(buildCorsOptions()));
@@ -49,7 +48,7 @@ app.use(
     stream: {
       write: (message: string) => logger.info(message.trim()),
     },
-  }),
+  })
 );
 
 app.use(express.json({ limit: "10mb" }));
@@ -66,8 +65,6 @@ app.use(sanitizePayloadMiddleware);
 app.use(globalAnonymousLimiter);
 app.use(globalAuthenticatedLimiter);
 
-app.use(authMiddleware);
-
 app.use("/api", router);
 
 app.use(notFoundMiddleware);
@@ -75,8 +72,7 @@ app.use(errorMiddleware);
 
 logger.info(
   { ...LOG_CONTEXT, event: "app_initialized" },
-  `[${LOG_CONTEXT.platform} ${LOG_CONTEXT.service}] Gateway application initialized`,
+  `[${LOG_CONTEXT.platform} ${LOG_CONTEXT.service}] Gateway application initialized`
 );
 
 export default app;
-

@@ -1,9 +1,8 @@
 import { Router } from "express";
-import { communicationProxy } from "../proxy/communication.proxy.js";
+import { notificationProxy } from "../proxy/notification.proxy.js";
 
 const router = Router();
 
-router.use(communicationProxy);
+router.use(notificationProxy);
 
 export default router;
-

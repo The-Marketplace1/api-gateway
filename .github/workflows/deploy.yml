@@ -1,11 +1,7 @@
 name: Deploy
 
 on:
-  push:
-    branches: [main]
-    tags:
-      - "v*.*.*"
-
+  workflow_dispatch:
 env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: marketplace-api-gateway
