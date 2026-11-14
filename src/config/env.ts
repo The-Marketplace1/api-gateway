@@ -3,7 +3,7 @@ import { z } from "zod";
 const envSchema = z.object({
   PORT: z.string().min(1, "PORT is required"),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
-  JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters"),
+  JWT_ACCESS_SECRET: z.string().min(32, "JWT_ACCESS_SECRET must be at least 32 characters"),
   REDIS_URL: z.string().url("REDIS_URL must be a valid URL"),
   AUTH_SERVICE_URL: z.string().url("AUTH_SERVICE_URL must be a valid URL"),
   BACKEND_API_URL: z.string().url("BACKEND_API_URL must be a valid URL"),
@@ -11,7 +11,7 @@ const envSchema = z.object({
   REALTIME_SERVICE_URL: z.string().url("REALTIME_SERVICE_URL must be a valid URL"),
   NOTIFICATION_SERVICE_URL: z.string().url("NOTIFICATION_SERVICE_URL must be a valid URL"),
   INTERNAL_SERVICE_TOKEN: z.string().min(1, "INTERNAL_SERVICE_TOKEN is required"),
-  UPSTREAM_TIMEOUT_MS: z.coerce.number().default(30000),
+  UPSTREAM_TIMEOUT_MS: z.coerce.number().int().positive().default(30000),
   METRICS_TOKEN: z.string().min(1, "METRICS_TOKEN is required"),
   ALLOWED_ORIGINS: z.string().min(1, "ALLOWED_ORIGINS is required - comma-separated list of allowed origins"),
   PLATFORM_NAME: z.string().default("Marketplace"),
@@ -29,7 +29,7 @@ function validateEnv() {
       .map((i: EnvIssue) => `  ${i.path.join(".")}: ${i.message}`)
       .join("\n");
     throw new Error(
-      `[api-gateway] Missing or invalid environment variables:\n${missing}\nSee .env.example for the full required configuration.`
+      `[api-gateway] Missing or invalid environment variables:\n${missing}\nSee .env.example for the full required configuration.`,
     );
   }
   return parsed.data;
