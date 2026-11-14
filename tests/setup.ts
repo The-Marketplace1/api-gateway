@@ -1,6 +1,6 @@
 process.env["PORT"] = "0";
 process.env["NODE_ENV"] = "test";
-process.env["JWT_SECRET"] = "test-secret-for-testing-only-must-be-32chars!!";
+process.env["JWT_ACCESS_SECRET"] = "test-access-secret-for-gateway-tests-32chars";
 process.env["REDIS_URL"] = "redis://localhost:6379";
 process.env["AUTH_SERVICE_URL"] = "http://localhost:3001";
 process.env["BACKEND_API_URL"] = "http://localhost:3002";
