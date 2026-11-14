@@ -1,29 +1,44 @@
 import jwt from "jsonwebtoken";
+import { z } from "zod";
 import { env } from "../config/env.js";
 
-export interface TokenPayload {
-  userId: string;
-  role: "customer" | "professional" | "admin";
-  iat?: number;
-  exp?: number;
-}
-
-export function verifyToken(token: string): TokenPayload {
-  const payload = jwt.verify(token, env.JWT_SECRET) as TokenPayload;
-  return payload;
-}
-
-export function extractBearerToken(
-  authHeader: string | undefined,
-): string | null {
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return null;
+const accessTokenClaimsSchema = z.object({
+  sub: z.string().min(1).max(128),
+  email: z.string().email().max(320),
+  role: z.enum(["customer", "professional", "admin"]),
+  sessionId: z.string().uuid(),
+  iat: z.number().int().nonnegative(),
+  exp: z.number().int().positive(),
+}).passthrough().superRefine((claims, ctx) => {
+  if (claims.exp <= claims.iat) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["exp"],
+      message: "Expiration must follow issuance",
+    });
   }
-  return authHeader.slice(7).trim() || null;
+  if (claims.iat > Math.floor(Date.now() / 1000) + 30) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["iat"],
+      message: "Issued-at time is in the future",
+    });
+  }
+});
+
+export interface AccessTokenClaims {
+  sub: string;
+  email: string;
+  role: "customer" | "professional" | "admin";
+  sessionId: string;
+  iat: number;
+  exp: number;
 }
 
-export function isTokenExpired(payload: TokenPayload): boolean {
-  if (!payload.exp) return false;
-  return Date.now() >= payload.exp * 1000;
-}
+export function verifyAccessToken(token: string): AccessTokenClaims {
+  const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET, {
+    algorithms: ["HS256"],
+  });
 
+  return accessTokenClaimsSchema.parse(decoded);
+}
